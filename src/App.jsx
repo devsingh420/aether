@@ -65,47 +65,342 @@ const Icon = {
 const MIN_ORDER = 1000;
 
 /* ═══════════════════════════════════════════════════════════
+   CATEGORIES — E-commerce structure
+═══════════════════════════════════════════════════════════ */
+const CATEGORIES = [
+  {
+    id: "fruits",
+    name: "Fruits",
+    icon: "🍎",
+    subcats: [
+      { id: "tropical", name: "Tropical Fruits" },
+      { id: "berries", name: "Berries" },
+      { id: "citrus", name: "Citrus" },
+    ],
+  },
+  {
+    id: "vegetables",
+    name: "Vegetables",
+    icon: "🥬",
+    subcats: [
+      { id: "leafy", name: "Leafy Greens" },
+      { id: "root", name: "Root Vegetables" },
+      { id: "tomatoes", name: "Tomatoes & Peppers" },
+    ],
+  },
+  {
+    id: "grains",
+    name: "Grains & Rice",
+    icon: "🌾",
+    subcats: [
+      { id: "rice", name: "Rice" },
+      { id: "cereals", name: "Cereals" },
+    ],
+  },
+  {
+    id: "herbs",
+    name: "Herbs & Spices",
+    icon: "🌿",
+    subcats: [
+      { id: "fresh-herbs", name: "Fresh Herbs" },
+      { id: "roots", name: "Roots & Rhizomes" },
+    ],
+  },
+];
+
+// Price trend data (simulated - last 7 days)
+const PRICE_TRENDS = {
+  fruits: {
+    name: "Fruits",
+    data: [142, 145, 148, 144, 150, 153, 155],
+    change: +9.2,
+  },
+  vegetables: {
+    name: "Vegetables",
+    data: [95, 92, 94, 98, 96, 99, 102],
+    change: +7.4,
+  },
+  grains: {
+    name: "Grains",
+    data: [58, 57, 58, 56, 55, 54, 55],
+    change: -5.2,
+  },
+  herbs: {
+    name: "Herbs",
+    data: [88, 90, 92, 89, 91, 93, 95],
+    change: +8.0,
+  },
+};
+
+/* ═══════════════════════════════════════════════════════════
    DATA
 ═══════════════════════════════════════════════════════════ */
 const FARMS = {
-  kasem:  { id:"kasem",  name:"Kasem Farms",       loc:"Chiang Rai",   rating:4.97, verified:true  },
-  sombat: { id:"sombat", name:"Sombat Organics",   loc:"Chiang Mai",   rating:4.89, verified:true  },
-  niran:  { id:"niran",  name:"Niran Hill",        loc:"Nan",          rating:4.94, verified:true  },
-  pracha: { id:"pracha", name:"Pracha Fresh",      loc:"Rayong",       rating:4.82, verified:false },
-  arunee: { id:"arunee", name:"Arunee Gardens",    loc:"Kanchanaburi", rating:4.91, verified:true  },
+  kasem: {
+    id: "kasem",
+    name: "Kasem Farms",
+    loc: "Chiang Rai",
+    rating: 4.97,
+    reviews: 312,
+    verified: true,
+    established: 2008,
+    size: "200 rai",
+    delivery: "24-48 hours to Bangkok",
+    image: "https://images.unsplash.com/photo-1500076656116-558758c991c1?w=800&q=80",
+    desc: "Family-owned farm in the highlands of Chiang Rai, specializing in premium tropical fruits. Our 200-rai orchard uses sustainable farming practices passed down three generations. We supply directly to Bangkok's top hotels including Mandarin Oriental and Four Seasons.",
+    certs: ["GlobalGAP", "Organic Thailand", "Thai Select"],
+  },
+  sombat: {
+    id: "sombat",
+    name: "Sombat Organics",
+    loc: "Chiang Mai",
+    rating: 4.89,
+    reviews: 187,
+    verified: true,
+    established: 2012,
+    size: "150 rai",
+    delivery: "24-48 hours to Bangkok",
+    image: "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=800&q=80",
+    desc: "Certified organic farm nestled in Chiang Mai's Mae Rim valley. We grow over 40 varieties of vegetables, herbs, and grains using traditional methods combined with modern organic techniques. Our produce is trusted by Michelin-starred restaurants across Thailand.",
+    certs: ["USDA Organic", "EU Organic", "Thai Organic"],
+  },
+  niran: {
+    id: "niran",
+    name: "Niran Hill Growers",
+    loc: "Nan Province",
+    rating: 4.94,
+    reviews: 241,
+    verified: true,
+    established: 2015,
+    size: "80 rai",
+    delivery: "48-72 hours to Bangkok",
+    image: "https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=800&q=80",
+    desc: "High-altitude farm at 1,400 meters in Nan's pristine mountains. Cool climate allows us to grow temperate berries and vegetables year-round. Part of the Royal Project Foundation, we employ local hill tribe communities and practice sustainable agriculture.",
+    certs: ["Royal Project", "PGS Organic", "Fair Trade"],
+  },
+  pracha: {
+    id: "pracha",
+    name: "Pracha Fresh Co.",
+    loc: "Rayong",
+    rating: 4.82,
+    reviews: 98,
+    verified: false,
+    established: 2018,
+    size: "120 rai",
+    delivery: "12-24 hours to Bangkok",
+    image: "https://images.unsplash.com/photo-1595855759920-86582396756a?w=800&q=80",
+    desc: "Eastern Thailand's premier durian and tropical fruit supplier. Located in Rayong's famous fruit belt, we harvest at optimal ripeness and deliver within hours. Our cold-chain logistics ensure perfect fruit every time.",
+    certs: ["GAP", "Food Safety"],
+  },
+  arunee: {
+    id: "arunee",
+    name: "Arunee Gardens",
+    loc: "Kanchanaburi",
+    rating: 4.91,
+    reviews: 156,
+    verified: true,
+    established: 2010,
+    size: "50 rai",
+    delivery: "Same day to Bangkok",
+    image: "https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=800&q=80",
+    desc: "State-of-the-art hydroponic facility producing pesticide-free leafy greens and herbs. Our climate-controlled greenhouses ensure consistent quality 365 days a year. We deliver fresh-cut produce to Bangkok within 4 hours of harvest.",
+    certs: ["Hydroponic Certified", "Pesticide-Free", "HACCP"],
+  },
 };
 
 const GRADES = {
-  A: { label: "A", color: "#15803d", bg: "#dcfce7", desc: "Premium quality" },
+  A: { label: "A", color: "#15803d", bg: "#dcfce7", desc: "Premium export quality" },
   B: { label: "B", color: "#1d4ed8", bg: "#dbeafe", desc: "Standard quality" },
   C: { label: "C", color: "#a16207", bg: "#fef9c3", desc: "Economy grade" },
 };
 
 const PRODUCTS = [
-  { id:"p1", farmId:"kasem",  name:"Hass Avocados",        cat:"Fruit",  img:"🥑", avail:4200, grade:"A",
-    desc:"Premium grade, cold-chain harvested. Zero middlemen.",
-    tiers:[{min:1,max:100,price:180},{min:101,max:500,price:145},{min:501,max:2000,price:115}] },
-  { id:"p2", farmId:"sombat", name:"Jasmine Rice",          cat:"Grain",  img:"🌾", avail:38000, grade:"A",
-    desc:"GI-certified Dok Mali. Milled same-day.",
-    tiers:[{min:1,max:500,price:65},{min:501,max:2000,price:52},{min:2001,max:10000,price:42}] },
-  { id:"p3", farmId:"niran",  name:"Strawberries",          cat:"Berry",  img:"🍓", avail:1200, grade:"A",
-    desc:"Royal Project. 1,400m altitude. Ships chilled.",
-    tiers:[{min:1,max:50,price:340},{min:51,max:200,price:280},{min:201,max:800,price:230}] },
-  { id:"p4", farmId:"pracha", name:"Monthong Durian",       cat:"Fruit",  img:"🥭", avail:2800, grade:"B",
-    desc:"Standard grade. Hand-selected at 80% ripeness.",
-    tiers:[{min:1,max:50,price:420},{min:51,max:200,price:340},{min:201,max:600,price:280}] },
-  { id:"p5", farmId:"arunee", name:"Baby Cos Lettuce",      cat:"Greens", img:"🥬", avail:5000, grade:"A",
-    desc:"Hydroponic. Zero pesticide. 14-day shelf life.",
-    tiers:[{min:1,max:100,price:115},{min:101,max:500,price:95},{min:501,max:2000,price:75}] },
-  { id:"p6", farmId:"kasem",  name:"Nam Dok Mai Mangoes",   cat:"Fruit",  img:"🥭", avail:6500, grade:"A",
-    desc:"Thailand's golden mango. Export grade.",
-    tiers:[{min:1,max:100,price:160},{min:101,max:500,price:130},{min:501,max:2000,price:105}] },
-  { id:"p7", farmId:"sombat", name:"Galangal Root",         cat:"Herb",   img:"🌿", avail:3200, grade:"B",
-    desc:"Young rhizome. Certified organic.",
-    tiers:[{min:1,max:100,price:100},{min:101,max:500,price:80},{min:501,max:2000,price:62}] },
-  { id:"p8", farmId:"niran",  name:"Cherry Tomatoes",       cat:"Veg",    img:"🍅", avail:900, grade:"A",
-    desc:"3 heirloom varieties. Never cold-stored.",
-    tiers:[{min:1,max:50,price:170},{min:51,max:200,price:140},{min:201,max:600,price:115}] },
+  {
+    id: "p1",
+    farmId: "kasem",
+    name: "Hass Avocados",
+    cat: "Fruit",
+    img: "https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?w=600&q=80",
+    images: [
+      "https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?w=600&q=80",
+      "https://images.unsplash.com/photo-1601039641847-7857b994d704?w=600&q=80",
+      "https://images.unsplash.com/photo-1519162808019-7de1683fa2ad?w=600&q=80",
+    ],
+    avail: 4200,
+    grade: "A",
+    harvest: "Daily at 4am",
+    shelf: "7-10 days",
+    storage: "Store at 4-7°C",
+    desc: "Premium Hass avocados from our high-altitude Chiang Rai orchard. Cold-chain harvested at dawn when sugar content peaks. Each fruit is hand-selected for size consistency (18-22 per 5kg tray) and ripeness (75% mature for optimal shipping). Supplied to leading hotel groups and Japanese supermarkets.",
+    specs: ["Size: 180-220g each", "Brix: 8-10°", "Oil content: 18-22%", "Origin: Chiang Rai highlands"],
+    tiers: [
+      { min: 1, max: 100, price: 180 },
+      { min: 101, max: 500, price: 145 },
+      { min: 501, max: 2000, price: 115 },
+    ],
+  },
+  {
+    id: "p2",
+    farmId: "sombat",
+    name: "Dok Mali Jasmine Rice",
+    cat: "Grain",
+    img: "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=600&q=80",
+    images: [
+      "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=600&q=80",
+      "https://images.unsplash.com/photo-1536304993881-ff6e9eefa2a6?w=600&q=80",
+    ],
+    avail: 38000,
+    grade: "A",
+    harvest: "Seasonal (Nov-Feb)",
+    shelf: "12 months",
+    storage: "Cool, dry place",
+    desc: "Authentic Thung Kula Rong Hai Jasmine Rice with Geographic Indication (GI) certification. Our Dok Mali 105 variety is renowned for its delicate floral aroma and soft, slightly sticky texture. Milled within 24 hours of your order and vacuum-packed in 25kg bags. The choice of Michelin-starred Thai restaurants.",
+    specs: ["Variety: Dok Mali 105", "Moisture: <14%", "Purity: 100%", "GI Certified: Thung Kula Rong Hai"],
+    tiers: [
+      { min: 1, max: 500, price: 65 },
+      { min: 501, max: 2000, price: 52 },
+      { min: 2001, max: 10000, price: 42 },
+    ],
+  },
+  {
+    id: "p3",
+    farmId: "niran",
+    name: "Royal Project Strawberries",
+    cat: "Berry",
+    img: "https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=600&q=80",
+    images: [
+      "https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=600&q=80",
+      "https://images.unsplash.com/photo-1543528176-61b239494933?w=600&q=80",
+      "https://images.unsplash.com/photo-1587393855524-087f83d95bc9?w=600&q=80",
+    ],
+    avail: 1200,
+    grade: "A",
+    harvest: "Daily at dawn",
+    shelf: "5-7 days",
+    storage: "Refrigerate 2-4°C",
+    desc: "Sweet, aromatic strawberries from the Royal Project at Doi Inthanon (1,400m altitude). Our cool highland climate produces exceptionally sweet berries with Brix 12-14°. Hand-picked at dawn, sorted into 250g clamshells, and shipped in refrigerated trucks. Zero pesticides - we use integrated pest management.",
+    specs: ["Brix: 12-14°", "Size: 25-35mm", "Variety: Pharachatan 80", "Altitude: 1,400m"],
+    tiers: [
+      { min: 1, max: 50, price: 340 },
+      { min: 51, max: 200, price: 280 },
+      { min: 201, max: 800, price: 230 },
+    ],
+  },
+  {
+    id: "p4",
+    farmId: "pracha",
+    name: "Monthong Durian",
+    cat: "Fruit",
+    img: "https://images.unsplash.com/photo-1588411393236-d2524cca1196?w=600&q=80",
+    images: [
+      "https://images.unsplash.com/photo-1588411393236-d2524cca1196?w=600&q=80",
+      "https://images.unsplash.com/photo-1590478969941-61c78b5f3b62?w=600&q=80",
+    ],
+    avail: 2800,
+    grade: "B",
+    harvest: "Seasonal (Apr-Jul)",
+    shelf: "3-5 days",
+    storage: "Room temp or chilled",
+    desc: "Monthong durian from Rayong - Thailand's premier durian belt. 'Monthong' means golden pillow, named for its thick, creamy flesh. Each fruit weighs 2.5-3.5kg and is tested for hollow seed before packing. Harvested at 80% ripeness for a 3-day eating window. Perfect for hotel buffets and premium retail.",
+    specs: ["Weight: 2.5-3.5kg", "Flesh ratio: >35%", "Ripeness: 80%", "No hollow seeds"],
+    tiers: [
+      { min: 1, max: 50, price: 420 },
+      { min: 51, max: 200, price: 340 },
+      { min: 201, max: 600, price: 280 },
+    ],
+  },
+  {
+    id: "p5",
+    farmId: "arunee",
+    name: "Hydroponic Baby Cos",
+    cat: "Greens",
+    img: "https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?w=600&q=80",
+    images: [
+      "https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?w=600&q=80",
+      "https://images.unsplash.com/photo-1556801712-76c8eb07bbc9?w=600&q=80",
+    ],
+    avail: 5000,
+    grade: "A",
+    harvest: "Harvested to order",
+    shelf: "14 days",
+    storage: "Refrigerate 2-5°C",
+    desc: "Crisp, tender baby cos lettuce grown in our closed-loop hydroponic system. Zero soil means zero soil-borne diseases and no pesticides needed. Nutrient-rich water is recycled and monitored 24/7 for optimal growth. Cut to order and delivered to Bangkok within 4 hours. Trusted by Tops Market and leading hotels.",
+    specs: ["Weight: 150-200g/head", "Height: 15-20cm", "Pesticide-free", "Hydroponic NFT system"],
+    tiers: [
+      { min: 1, max: 100, price: 115 },
+      { min: 101, max: 500, price: 95 },
+      { min: 501, max: 2000, price: 75 },
+    ],
+  },
+  {
+    id: "p6",
+    farmId: "kasem",
+    name: "Nam Dok Mai Mangoes",
+    cat: "Fruit",
+    img: "https://images.unsplash.com/photo-1553279768-865429fa0078?w=600&q=80",
+    images: [
+      "https://images.unsplash.com/photo-1553279768-865429fa0078?w=600&q=80",
+      "https://images.unsplash.com/photo-1591073113125-e46713c829ed?w=600&q=80",
+      "https://images.unsplash.com/photo-1601493700631-2b16ec4b4716?w=600&q=80",
+    ],
+    avail: 6500,
+    grade: "A",
+    harvest: "Seasonal (Mar-Jun)",
+    shelf: "5-7 days",
+    storage: "Room temp to ripen",
+    desc: "Nam Dok Mai Si Thong - the queen of Thai mangoes. Our export-grade mangoes feature fiber-free golden flesh with an intense honey-sweet aroma. Each fruit (350-450g) is individually foam-netted to prevent bruising. Ships green for a 5-day ripening window. Approved for export to Japan, Korea, and EU.",
+    specs: ["Size: 350-450g (Size 3)", "Brix: 18-22°", "Fiber-free flesh", "Export certified"],
+    tiers: [
+      { min: 1, max: 100, price: 160 },
+      { min: 101, max: 500, price: 130 },
+      { min: 501, max: 2000, price: 105 },
+    ],
+  },
+  {
+    id: "p7",
+    farmId: "sombat",
+    name: "Fresh Galangal Root",
+    cat: "Herb",
+    img: "https://images.unsplash.com/photo-1615485500704-8e990f9900f7?w=600&q=80",
+    images: [
+      "https://images.unsplash.com/photo-1615485500704-8e990f9900f7?w=600&q=80",
+    ],
+    avail: 3200,
+    grade: "B",
+    harvest: "Year-round",
+    shelf: "2-3 weeks",
+    storage: "Refrigerate or freeze",
+    desc: "Young galangal rhizome from Chiang Mai highlands - the backbone of Thai cuisine. Our galangal is harvested young for tender texture, ideal for Tom Kha and herbal drinks. Each rhizome is washed, trimmed, and vacuum-sealed in 5kg packs. Consistently rated #1 by Bangkok's top Thai restaurant groups.",
+    specs: ["Age: 6-8 months", "Length: 8-15cm", "Tender inner flesh", "Vacuum sealed 5kg"],
+    tiers: [
+      { min: 1, max: 100, price: 100 },
+      { min: 101, max: 500, price: 80 },
+      { min: 501, max: 2000, price: 62 },
+    ],
+  },
+  {
+    id: "p8",
+    farmId: "niran",
+    name: "Heirloom Cherry Tomatoes",
+    cat: "Veg",
+    img: "https://images.unsplash.com/photo-1546094096-0df4bcaaa337?w=600&q=80",
+    images: [
+      "https://images.unsplash.com/photo-1546094096-0df4bcaaa337?w=600&q=80",
+      "https://images.unsplash.com/photo-1561155707-64c65962a676?w=600&q=80",
+    ],
+    avail: 900,
+    grade: "A",
+    harvest: "Daily morning pick",
+    shelf: "7-10 days",
+    storage: "Room temp (do not refrigerate)",
+    desc: "Three heirloom varieties in one: Sweet 100 (red), Yellow Pear, and Black Cherry. Grown on vertical trellises at 800m altitude in Nan. Never refrigerated - we pick to order each morning to preserve flavor and texture. Brix 8-10° with complex, wine-like sweetness. Popular with hotel chefs and specialty grocers.",
+    specs: ["Varieties: 3 heirloom mix", "Brix: 8-10°", "Size: 15-25mm", "Never cold-stored"],
+    tiers: [
+      { min: 1, max: 50, price: 170 },
+      { min: 51, max: 200, price: 140 },
+      { min: 201, max: 600, price: 115 },
+    ],
+  },
 ];
 
 /* ═══════════════════════════════════════════════════════════
@@ -174,21 +469,26 @@ function Card({ product, onClick }) {
         cursor: "pointer",
         transition: "all 0.2s ease",
         transform: hover ? "translateY(-2px)" : "none",
+        overflow: "hidden",
       }}
     >
       {/* Image */}
       <div style={{
-        background: T.subtle,
-        borderRadius: T.radius,
-        aspectRatio: "4/3",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        margin: 8,
-        marginBottom: 0,
         position: "relative",
+        aspectRatio: "4/3",
+        overflow: "hidden",
       }}>
-        <span style={{ fontSize: 56, userSelect: "none" }}>{product.img}</span>
+        <img
+          src={product.img}
+          alt={product.name}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            transition: "transform 0.3s ease",
+            transform: hover ? "scale(1.05)" : "scale(1)",
+          }}
+        />
         {/* Grade badge */}
         <span style={{
           position: "absolute",
@@ -214,6 +514,19 @@ function Card({ product, onClick }) {
             borderRadius: T.radiusFull,
           }}>Save {save}%</span>
         )}
+        {/* Delivery badge */}
+        <span style={{
+          position: "absolute",
+          bottom: 10,
+          left: 10,
+          background: "rgba(0,0,0,0.7)",
+          color: T.white,
+          fontSize: 10,
+          fontWeight: 500,
+          padding: "4px 8px",
+          borderRadius: T.radius - 4,
+          backdropFilter: "blur(4px)",
+        }}>🚚 {farm.delivery}</span>
       </div>
 
       {/* Content */}
@@ -238,6 +551,226 @@ function Card({ product, onClick }) {
         </div>
       </div>
     </article>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PRICE CHART — Mini sparkline for trends
+═══════════════════════════════════════════════════════════ */
+function PriceChart({ data, change, height = 40, width = 120 }) {
+  const min = Math.min(...data);
+  const max = Math.max(...data);
+  const range = max - min || 1;
+
+  const points = data.map((v, i) => {
+    const x = (i / (data.length - 1)) * width;
+    const y = height - ((v - min) / range) * height;
+    return `${x},${y}`;
+  }).join(" ");
+
+  const color = change >= 0 ? "#22c55e" : "#ef4444";
+
+  return (
+    <svg width={width} height={height} style={{ overflow: "visible" }}>
+      <polyline
+        points={points}
+        fill="none"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle
+        cx={(data.length - 1) / (data.length - 1) * width}
+        cy={height - ((data[data.length - 1] - min) / range) * height}
+        r="3"
+        fill={color}
+      />
+    </svg>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MARKET TRENDS — Price overview panel
+═══════════════════════════════════════════════════════════ */
+function MarketTrends() {
+  return (
+    <div style={{
+      background: T.subtle,
+      borderRadius: T.radius + 4,
+      padding: 20,
+      marginBottom: 32,
+    }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+        <h2 style={{ fontSize: 18, fontWeight: 600 }}>Market Trends</h2>
+        <span style={{ fontSize: 12, color: T.gray }}>Last 7 days</span>
+      </div>
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+        gap: 12,
+      }}>
+        {Object.entries(PRICE_TRENDS).map(([key, trend]) => (
+          <div key={key} style={{
+            background: T.white,
+            borderRadius: T.radius,
+            padding: 16,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}>
+            <div>
+              <div style={{ fontSize: 13, color: T.gray, marginBottom: 4 }}>{trend.name}</div>
+              <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
+                <span style={{ fontSize: 18, fontWeight: 700 }}>฿{trend.data[trend.data.length - 1]}</span>
+                <span style={{
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: trend.change >= 0 ? "#22c55e" : "#ef4444",
+                }}>
+                  {trend.change >= 0 ? "+" : ""}{trend.change}%
+                </span>
+              </div>
+            </div>
+            <PriceChart data={trend.data} change={trend.change} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FILTERS PANEL — Category, Grade, etc.
+═══════════════════════════════════════════════════════════ */
+function FiltersPanel({ filters, setFilters, products }) {
+  const grades = ["A", "B", "C"];
+  const farms = [...new Set(products.map(p => p.farmId))];
+
+  const toggle = (key, value) => {
+    setFilters(prev => {
+      const current = prev[key] || [];
+      if (current.includes(value)) {
+        return { ...prev, [key]: current.filter(v => v !== value) };
+      }
+      return { ...prev, [key]: [...current, value] };
+    });
+  };
+
+  const clear = () => setFilters({});
+  const hasFilters = Object.values(filters).some(arr => arr?.length > 0);
+
+  return (
+    <div style={{
+      background: T.white,
+      border: `1px solid ${T.border}`,
+      borderRadius: T.radius,
+      padding: 20,
+      marginBottom: 24,
+    }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+        <h3 style={{ fontSize: 15, fontWeight: 600 }}>Filters</h3>
+        {hasFilters && (
+          <button onClick={clear} style={{
+            background: "none",
+            border: "none",
+            color: T.gray,
+            fontSize: 13,
+            cursor: "pointer",
+            textDecoration: "underline",
+          }}>Clear all</button>
+        )}
+      </div>
+
+      {/* Categories */}
+      <div style={{ marginBottom: 20 }}>
+        <div style={{ fontSize: 13, fontWeight: 500, marginBottom: 10 }}>Category</div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+          {CATEGORIES.map(cat => {
+            const active = filters.category?.includes(cat.id);
+            return (
+              <button
+                key={cat.id}
+                onClick={() => toggle("category", cat.id)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                  padding: "6px 12px",
+                  borderRadius: T.radiusFull,
+                  border: `1px solid ${active ? T.black : T.border}`,
+                  background: active ? T.black : T.white,
+                  color: active ? T.white : T.text,
+                  fontSize: 13,
+                  cursor: "pointer",
+                }}
+              >
+                <span>{cat.icon}</span>
+                {cat.name}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Grades */}
+      <div style={{ marginBottom: 20 }}>
+        <div style={{ fontSize: 13, fontWeight: 500, marginBottom: 10 }}>Grade</div>
+        <div style={{ display: "flex", gap: 8 }}>
+          {grades.map(g => {
+            const grade = GRADES[g];
+            const active = filters.grade?.includes(g);
+            return (
+              <button
+                key={g}
+                onClick={() => toggle("grade", g)}
+                style={{
+                  padding: "8px 16px",
+                  borderRadius: T.radius,
+                  border: active ? `2px solid ${grade.color}` : `1px solid ${T.border}`,
+                  background: active ? grade.bg : T.white,
+                  color: active ? grade.color : T.text,
+                  fontSize: 14,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                }}
+              >
+                Grade {g}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Farms */}
+      <div>
+        <div style={{ fontSize: 13, fontWeight: 500, marginBottom: 10 }}>Farm</div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+          {farms.map(farmId => {
+            const farm = FARMS[farmId];
+            const active = filters.farm?.includes(farmId);
+            return (
+              <button
+                key={farmId}
+                onClick={() => toggle("farm", farmId)}
+                style={{
+                  padding: "6px 12px",
+                  borderRadius: T.radiusFull,
+                  border: `1px solid ${active ? T.black : T.border}`,
+                  background: active ? T.black : T.white,
+                  color: active ? T.white : T.text,
+                  fontSize: 12,
+                  cursor: "pointer",
+                }}
+              >
+                {farm.name}
+                {farm.verified && " ✓"}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -755,6 +1288,7 @@ function ProductDetail({ product, onBack, onInquiry, user, onShowAuth }) {
   const max = getMax(product);
   const [qty, setQty] = useState(product.tiers[0].min);
   const [showInquiry, setShowInquiry] = useState(false);
+  const [selectedImg, setSelectedImg] = useState(0);
 
   const w = useWidth();
   const mobile = w < 768;
@@ -790,18 +1324,22 @@ function ProductDetail({ product, onBack, onInquiry, user, onShowAuth }) {
       }}>
         {/* Left — Product */}
         <div>
-          {/* Hero image */}
+          {/* Main image */}
           <div style={{
-            background: T.subtle,
             borderRadius: T.radius + 8,
-            aspectRatio: "4/3",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            marginBottom: 24,
+            overflow: "hidden",
+            marginBottom: 12,
             position: "relative",
           }}>
-            <span style={{ fontSize: mobile ? 80 : 120, userSelect: "none" }}>{product.img}</span>
+            <img
+              src={product.images[selectedImg]}
+              alt={product.name}
+              style={{
+                width: "100%",
+                aspectRatio: "4/3",
+                objectFit: "cover",
+              }}
+            />
             {/* Grade badge */}
             <span style={{
               position: "absolute",
@@ -813,55 +1351,178 @@ function ProductDetail({ product, onBack, onInquiry, user, onShowAuth }) {
               fontWeight: 700,
               padding: "6px 14px",
               borderRadius: T.radiusFull,
-            }}>Grade {grade.label}</span>
+            }}>Grade {grade.label} · {grade.desc}</span>
           </div>
 
-          {/* Farm */}
-          <div style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 12,
-            padding: 16,
-            background: T.subtle,
-            borderRadius: T.radius,
-            marginBottom: 20,
-          }}>
-            <div style={{
-              width: 44,
-              height: 44,
-              borderRadius: "50%",
-              background: T.white,
-              border: `1px solid ${T.border}`,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontWeight: 600,
-              color: T.text,
-            }}>
-              {farm.name.split(" ").map(w => w[0]).join("")}
+          {/* Thumbnail gallery */}
+          {product.images.length > 1 && (
+            <div style={{ display: "flex", gap: 8, marginBottom: 24 }}>
+              {product.images.map((img, i) => (
+                <button
+                  key={i}
+                  onClick={() => setSelectedImg(i)}
+                  style={{
+                    width: 64,
+                    height: 64,
+                    borderRadius: T.radius - 4,
+                    overflow: "hidden",
+                    border: selectedImg === i ? `2px solid ${T.black}` : `2px solid transparent`,
+                    padding: 0,
+                    cursor: "pointer",
+                    opacity: selectedImg === i ? 1 : 0.6,
+                    transition: "all 0.2s",
+                  }}
+                >
+                  <img src={img} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                </button>
+              ))}
             </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontWeight: 600, marginBottom: 2 }}>{farm.name}</div>
-              <div style={{ fontSize: 13, color: T.gray }}>
-                {farm.loc} · ★ {farm.rating}
+          )}
+
+          {/* Quick info cards */}
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(3, 1fr)",
+            gap: 8,
+            marginBottom: 24,
+          }}>
+            <div style={{ background: T.subtle, borderRadius: T.radius, padding: 12 }}>
+              <div style={{ fontSize: 11, color: T.gray, marginBottom: 4 }}>Harvest</div>
+              <div style={{ fontSize: 13, fontWeight: 600 }}>{product.harvest}</div>
+            </div>
+            <div style={{ background: T.subtle, borderRadius: T.radius, padding: 12 }}>
+              <div style={{ fontSize: 11, color: T.gray, marginBottom: 4 }}>Shelf Life</div>
+              <div style={{ fontSize: 13, fontWeight: 600 }}>{product.shelf}</div>
+            </div>
+            <div style={{ background: T.subtle, borderRadius: T.radius, padding: 12 }}>
+              <div style={{ fontSize: 11, color: T.gray, marginBottom: 4 }}>Delivery</div>
+              <div style={{ fontSize: 13, fontWeight: 600 }}>{farm.delivery}</div>
+            </div>
+          </div>
+
+          {/* Product description */}
+          <div style={{ marginBottom: 24 }}>
+            <h3 style={{ fontSize: 15, fontWeight: 600, marginBottom: 12 }}>About this product</h3>
+            <p style={{ fontSize: 14, color: T.gray, lineHeight: 1.7 }}>
+              {product.desc}
+            </p>
+          </div>
+
+          {/* Specifications */}
+          {product.specs && (
+            <div style={{ marginBottom: 24 }}>
+              <h3 style={{ fontSize: 15, fontWeight: 600, marginBottom: 12 }}>Specifications</h3>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                {product.specs.map((spec, i) => (
+                  <span key={i} style={{
+                    background: T.subtle,
+                    padding: "6px 12px",
+                    borderRadius: T.radiusFull,
+                    fontSize: 12,
+                    color: T.text,
+                  }}>{spec}</span>
+                ))}
               </div>
             </div>
-            {farm.verified && (
-              <span style={{
-                background: "#dcfce7",
-                color: "#15803d",
-                fontSize: 11,
-                fontWeight: 600,
-                padding: "4px 10px",
-                borderRadius: T.radiusFull,
-              }}>Verified</span>
-            )}
+          )}
+
+          {/* Storage instructions */}
+          <div style={{
+            background: "#fef9c3",
+            borderRadius: T.radius,
+            padding: 14,
+            marginBottom: 24,
+          }}>
+            <div style={{ fontSize: 12, fontWeight: 600, color: "#a16207", marginBottom: 4 }}>
+              📦 Storage
+            </div>
+            <div style={{ fontSize: 13, color: "#854d0e" }}>{product.storage}</div>
           </div>
 
-          {/* Description */}
-          <p style={{ fontSize: 15, color: T.gray, lineHeight: 1.6 }}>
-            {product.desc}
-          </p>
+          {/* Farm section */}
+          <div style={{
+            border: `1px solid ${T.border}`,
+            borderRadius: T.radius + 4,
+            overflow: "hidden",
+          }}>
+            {/* Farm image */}
+            <img
+              src={farm.image}
+              alt={farm.name}
+              style={{
+                width: "100%",
+                height: 160,
+                objectFit: "cover",
+              }}
+            />
+            <div style={{ padding: 16 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+                <div style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: "50%",
+                  background: T.subtle,
+                  border: `1px solid ${T.border}`,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontWeight: 600,
+                  color: T.text,
+                  flexShrink: 0,
+                }}>
+                  {farm.name.split(" ").map(w => w[0]).join("")}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 600, marginBottom: 2 }}>{farm.name}</div>
+                  <div style={{ fontSize: 13, color: T.gray }}>
+                    {farm.loc} · Est. {farm.established} · {farm.size}
+                  </div>
+                </div>
+                {farm.verified && (
+                  <span style={{
+                    background: "#dcfce7",
+                    color: "#15803d",
+                    fontSize: 11,
+                    fontWeight: 600,
+                    padding: "4px 10px",
+                    borderRadius: T.radiusFull,
+                  }}>Verified</span>
+                )}
+              </div>
+
+              {/* Rating */}
+              <div style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                marginBottom: 12,
+                paddingBottom: 12,
+                borderBottom: `1px solid ${T.subtle}`,
+              }}>
+                <span style={{ fontSize: 18, fontWeight: 700 }}>★ {farm.rating}</span>
+                <span style={{ fontSize: 13, color: T.gray }}>({farm.reviews} reviews)</span>
+              </div>
+
+              {/* Farm description */}
+              <p style={{ fontSize: 13, color: T.gray, lineHeight: 1.6, marginBottom: 12 }}>
+                {farm.desc}
+              </p>
+
+              {/* Certifications */}
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {farm.certs.map((cert, i) => (
+                  <span key={i} style={{
+                    background: "#dbeafe",
+                    color: "#1d4ed8",
+                    padding: "4px 10px",
+                    borderRadius: T.radiusFull,
+                    fontSize: 11,
+                    fontWeight: 600,
+                  }}>{cert}</span>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Right — Pricing */}
@@ -1029,84 +1690,234 @@ function ProductDetail({ product, onBack, onInquiry, user, onShowAuth }) {
 ═══════════════════════════════════════════════════════════ */
 function MarketPage({ onSelect }) {
   const [search, setSearch] = useState("");
+  const [filters, setFilters] = useState({});
+  const [showFilters, setShowFilters] = useState(false);
   const w = useWidth();
   const mobile = w < 768;
 
+  // Map categories to products
+  const catMap = {
+    fruits: ["Fruit", "Berry"],
+    vegetables: ["Greens", "Veg"],
+    grains: ["Grain"],
+    herbs: ["Herb"],
+  };
+
   const list = useMemo(() => {
-    if (!search) return PRODUCTS;
-    const q = search.toLowerCase();
-    return PRODUCTS.filter(p =>
-      p.name.toLowerCase().includes(q) ||
-      FARMS[p.farmId].name.toLowerCase().includes(q) ||
-      p.cat.toLowerCase().includes(q)
-    );
-  }, [search]);
+    let filtered = PRODUCTS;
+
+    // Search
+    if (search) {
+      const q = search.toLowerCase();
+      filtered = filtered.filter(p =>
+        p.name.toLowerCase().includes(q) ||
+        FARMS[p.farmId].name.toLowerCase().includes(q) ||
+        p.cat.toLowerCase().includes(q)
+      );
+    }
+
+    // Category filter
+    if (filters.category?.length > 0) {
+      const cats = filters.category.flatMap(c => catMap[c] || []);
+      filtered = filtered.filter(p => cats.includes(p.cat));
+    }
+
+    // Grade filter
+    if (filters.grade?.length > 0) {
+      filtered = filtered.filter(p => filters.grade.includes(p.grade));
+    }
+
+    // Farm filter
+    if (filters.farm?.length > 0) {
+      filtered = filtered.filter(p => filters.farm.includes(p.farmId));
+    }
+
+    return filtered;
+  }, [search, filters]);
+
+  const activeFilterCount = Object.values(filters).reduce((acc, arr) => acc + (arr?.length || 0), 0);
 
   return (
     <>
       {/* Hero */}
-      <div style={{ marginBottom: 48, maxWidth: 600 }}>
+      <div style={{ marginBottom: 32, maxWidth: 600 }}>
         <h1 style={{
-          fontSize: mobile ? 36 : 56,
+          fontSize: mobile ? 32 : 48,
           fontWeight: 600,
-          letterSpacing: "-1.5px",
-          lineHeight: 1.05,
-          marginBottom: 16,
+          letterSpacing: "-1px",
+          lineHeight: 1.1,
+          marginBottom: 12,
         }}>
-          Buy direct from<br />Thailand's farms.
+          Fresh from Thailand's farms
         </h1>
-        <p style={{ fontSize: mobile ? 16 : 18, color: T.gray, lineHeight: 1.5 }}>
-          No middlemen. Tiered pricing. Farm-verified produce.
+        <p style={{ fontSize: mobile ? 15 : 17, color: T.gray, lineHeight: 1.5 }}>
+          Direct sourcing. Tiered pricing. Quality guaranteed.
         </p>
       </div>
 
-      {/* Search */}
+      {/* Market Trends */}
+      <MarketTrends />
+
+      {/* Search & Filter bar */}
       <div style={{
         display: "flex",
-        alignItems: "center",
         gap: 12,
-        background: T.subtle,
-        borderRadius: T.radiusFull,
-        padding: "12px 20px",
-        marginBottom: 40,
-        maxWidth: 480,
+        marginBottom: 24,
+        flexWrap: "wrap",
       }}>
-        <span style={{ color: T.gray, display: "flex" }}>{Icon.search}</span>
-        <input
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          placeholder="Search products or farms..."
-          style={{
-            flex: 1,
-            border: "none",
-            background: "none",
-            fontSize: 16,
-            outline: "none",
-            fontFamily: "inherit",
-          }}
-        />
-        {search && (
-          <button
-            onClick={() => setSearch("")}
+        {/* Search */}
+        <div style={{
+          flex: 1,
+          minWidth: 200,
+          display: "flex",
+          alignItems: "center",
+          gap: 12,
+          background: T.subtle,
+          borderRadius: T.radiusFull,
+          padding: "10px 18px",
+        }}>
+          <span style={{ color: T.gray, display: "flex" }}>{Icon.search}</span>
+          <input
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Search products, farms..."
             style={{
-              background: "none",
+              flex: 1,
               border: "none",
-              cursor: "pointer",
-              color: T.gray,
-              display: "flex",
-              padding: 4,
+              background: "none",
+              fontSize: 15,
+              outline: "none",
+              fontFamily: "inherit",
             }}
-          >{Icon.close}</button>
-        )}
+          />
+          {search && (
+            <button
+              onClick={() => setSearch("")}
+              style={{
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                color: T.gray,
+                display: "flex",
+                padding: 4,
+              }}
+            >{Icon.close}</button>
+          )}
+        </div>
+
+        {/* Filter toggle */}
+        <button
+          onClick={() => setShowFilters(!showFilters)}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            padding: "10px 18px",
+            borderRadius: T.radiusFull,
+            border: `1px solid ${showFilters ? T.black : T.border}`,
+            background: showFilters ? T.black : T.white,
+            color: showFilters ? T.white : T.text,
+            fontSize: 14,
+            fontWeight: 500,
+            cursor: "pointer",
+          }}
+        >
+          <svg width="16" height="16" fill="none" viewBox="0 0 16 16">
+            <path d="M2 4h12M4 8h8M6 12h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+          </svg>
+          Filters
+          {activeFilterCount > 0 && (
+            <span style={{
+              background: showFilters ? T.white : T.black,
+              color: showFilters ? T.black : T.white,
+              fontSize: 11,
+              fontWeight: 700,
+              padding: "2px 8px",
+              borderRadius: T.radiusFull,
+            }}>{activeFilterCount}</span>
+          )}
+        </button>
       </div>
 
-      {/* Results */}
-      {list.length > 0 && (
-        <div style={{ fontSize: 14, color: T.gray, marginBottom: 20 }}>
+      {/* Filters Panel */}
+      {showFilters && (
+        <FiltersPanel filters={filters} setFilters={setFilters} products={PRODUCTS} />
+      )}
+
+      {/* Category quick links */}
+      <div style={{
+        display: "flex",
+        gap: 10,
+        marginBottom: 24,
+        overflowX: "auto",
+        paddingBottom: 4,
+      }}>
+        {CATEGORIES.map(cat => {
+          const isActive = filters.category?.includes(cat.id);
+          return (
+            <button
+              key={cat.id}
+              onClick={() => {
+                if (isActive) {
+                  setFilters(prev => ({
+                    ...prev,
+                    category: prev.category.filter(c => c !== cat.id)
+                  }));
+                } else {
+                  setFilters(prev => ({
+                    ...prev,
+                    category: [...(prev.category || []), cat.id]
+                  }));
+                }
+              }}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                padding: "10px 18px",
+                borderRadius: T.radius,
+                border: `1px solid ${isActive ? T.black : T.border}`,
+                background: isActive ? T.black : T.white,
+                color: isActive ? T.white : T.text,
+                fontSize: 14,
+                fontWeight: 500,
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+                flexShrink: 0,
+              }}
+            >
+              <span style={{ fontSize: 18 }}>{cat.icon}</span>
+              {cat.name}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Results header */}
+      <div style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: 20,
+      }}>
+        <div style={{ fontSize: 14, color: T.gray }}>
           {list.length} product{list.length !== 1 ? "s" : ""}
           {search && ` for "${search}"`}
         </div>
-      )}
+        {(search || activeFilterCount > 0) && (
+          <button
+            onClick={() => { setSearch(""); setFilters({}); }}
+            style={{
+              background: "none",
+              border: "none",
+              color: T.gray,
+              fontSize: 13,
+              cursor: "pointer",
+              textDecoration: "underline",
+            }}
+          >Clear all</button>
+        )}
+      </div>
 
       {/* Grid */}
       {list.length > 0 ? (
@@ -1120,9 +1931,10 @@ function MarketPage({ onSelect }) {
       ) : (
         <div style={{ textAlign: "center", padding: "80px 0", color: T.gray }}>
           <div style={{ fontSize: 48, marginBottom: 16, opacity: 0.5 }}>🔍</div>
-          <div style={{ fontWeight: 500, color: T.text, marginBottom: 8 }}>No results</div>
+          <div style={{ fontWeight: 500, color: T.text, marginBottom: 8 }}>No products found</div>
+          <p style={{ marginBottom: 16 }}>Try adjusting your filters or search term</p>
           <button
-            onClick={() => setSearch("")}
+            onClick={() => { setSearch(""); setFilters({}); }}
             style={{
               background: T.black,
               color: T.white,
