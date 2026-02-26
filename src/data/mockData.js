@@ -93,11 +93,41 @@ export const FARMS = {
   },
 };
 
+// Helper to get products with farm data
+export function getProductsWithFarms(products = PRODUCTS) {
+  return products.map(p => ({
+    ...p,
+    farm: FARMS[p.farmId] || {},
+  }));
+}
+
+// Get featured products (high rating farms, grade A)
+export function getFeaturedProducts() {
+  return getProductsWithFarms()
+    .filter(p => p.grade === 'A' && p.farm.verified)
+    .map(p => ({ ...p, featured: true }))
+    .slice(0, 4);
+}
+
+// Get hot sale products (urgent sales, discounted)
+export function getHotSaleProducts() {
+  return getProductsWithFarms()
+    .filter(p => p.stock > 1000) // High stock = need to sell
+    .map(p => ({
+      ...p,
+      urgentSale: true,
+      discount: Math.floor(Math.random() * 15 + 10),
+      daysLeft: Math.floor(Math.random() * 3 + 1),
+    }))
+    .slice(0, 6);
+}
+
 export const PRODUCTS = [
   {
     id: "p1",
     farmId: "kasem",
     name: "Hass Avocados",
+    priceChange: 3.2, // Daily price change %
     cat: "fruits",
     subcat: "Tropical",
     img: "https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?w=600&q=80",
@@ -139,6 +169,7 @@ export const PRODUCTS = [
     id: "p2",
     farmId: "sombat",
     name: "Dok Mali Jasmine Rice",
+    priceChange: -1.5,
     cat: "grains",
     subcat: "Thai Rice",
     img: "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=600&q=80",
@@ -177,6 +208,7 @@ export const PRODUCTS = [
     id: "p3",
     farmId: "niran",
     name: "Royal Project Strawberries",
+    priceChange: 5.8,
     cat: "fruits",
     subcat: "Berries",
     img: "https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=600&q=80",
@@ -218,6 +250,7 @@ export const PRODUCTS = [
     id: "p4",
     farmId: "pracha",
     name: "Monthong Durian",
+    priceChange: -2.3,
     cat: "fruits",
     subcat: "Tropical",
     img: "https://images.unsplash.com/photo-1588411393236-d2524cca1196?w=600&q=80",
@@ -256,6 +289,7 @@ export const PRODUCTS = [
     id: "p5",
     farmId: "arunee",
     name: "Hydroponic Baby Cos",
+    priceChange: 1.2,
     cat: "vegetables",
     subcat: "Leafy Greens",
     img: "https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?w=600&q=80",
@@ -294,6 +328,7 @@ export const PRODUCTS = [
     id: "p6",
     farmId: "kasem",
     name: "Nam Dok Mai Mangoes",
+    priceChange: 4.5,
     cat: "fruits",
     subcat: "Tropical",
     img: "https://images.unsplash.com/photo-1553279768-865429fa0078?w=600&q=80",
@@ -335,6 +370,7 @@ export const PRODUCTS = [
     id: "p7",
     farmId: "sombat",
     name: "Fresh Galangal",
+    priceChange: -0.8,
     cat: "herbs",
     subcat: "Roots",
     img: "https://images.unsplash.com/photo-1615485500704-8e990f9900f7?w=600&q=80",
@@ -373,6 +409,7 @@ export const PRODUCTS = [
     id: "p8",
     farmId: "niran",
     name: "Heirloom Cherry Tomatoes",
+    priceChange: 2.1,
     cat: "vegetables",
     subcat: "Tomatoes",
     img: "https://images.unsplash.com/photo-1546094096-0df4bcaaa337?w=600&q=80",

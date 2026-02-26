@@ -4,9 +4,12 @@ import { Icon } from '../data/icons';
 import { useStore } from '../store';
 import { useMobile } from '../hooks/useWidth';
 import { ProductCard } from '../components/product/ProductCard';
+import { FeaturedBanner } from '../components/home/FeaturedBanner';
+import { HotSales } from '../components/home/HotSales';
+import { FeaturedProducts } from '../components/home/FeaturedProducts';
 
 // Mock data for now - will be replaced with API calls
-import { PRODUCTS, FARMS, PRICE_TRENDS } from '../data/mockData';
+import { PRODUCTS, FARMS, PRICE_TRENDS, getFeaturedProducts, getHotSaleProducts } from '../data/mockData';
 
 function MarketTrends() {
   const { mode } = useStore();
@@ -242,6 +245,11 @@ export function MarketPage({ onSelectProduct }) {
   });
   const [showFilters, setShowFilters] = useState(false);
 
+  // Get featured and hot sale products
+  const featuredProducts = useMemo(() => getFeaturedProducts(), []);
+  const hotSaleProducts = useMemo(() => getHotSaleProducts(), []);
+  const hasActiveFilters = filters.category || filters.grade || filters.farmId || search;
+
   // Filter products
   const filteredProducts = useMemo(() => {
     return PRODUCTS.filter((product) => {
@@ -270,6 +278,15 @@ export function MarketPage({ onSelectProduct }) {
 
   return (
     <div style={{ maxWidth: 1200, margin: '0 auto', padding: isMobile ? 16 : 24 }}>
+      {/* Featured sections (only show when no filters active) */}
+      {!hasActiveFilters && (
+        <>
+          <FeaturedBanner onAction={(banner) => console.log('Banner action:', banner)} />
+          <HotSales products={hotSaleProducts} onSelect={onSelectProduct} />
+          <FeaturedProducts products={featuredProducts} onSelect={onSelectProduct} />
+        </>
+      )}
+
       {/* Market Trends (wholesale only) */}
       <MarketTrends />
 

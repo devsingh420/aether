@@ -1,0 +1,1 @@
+export { QuickCheckout } from './QuickCheckout';

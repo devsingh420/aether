@@ -3,6 +3,7 @@ import { T, GRADES, CONFIG } from '../../data/constants';
 import { Icon } from '../../data/icons';
 import { useStore } from '../../store';
 import { fmt, getWholesalePrice, pct } from '../../utils/helpers';
+import { PriceChangeBadge } from '../ui/Badge';
 
 export function ProductCard({ product, onClick }) {
   const [hovered, setHovered] = useState(false);
@@ -202,6 +203,7 @@ export function ProductCard({ product, onClick }) {
               {fmt(displayPrice)}
             </span>
             <span style={{ fontSize: 13, color: T.gray }}>{unit}</span>
+            <PriceChangeBadge change={product.priceChange} />
           </div>
 
           {/* Cold chain indicator */}

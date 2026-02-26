@@ -51,6 +51,29 @@ export function GradeBadge({ grade }) {
   );
 }
 
+export function PriceChangeBadge({ change }) {
+  if (!change || change === 0) return null;
+
+  const isPositive = change > 0;
+  const color = isPositive ? T.green : T.error;
+  const arrow = isPositive ? '↑' : '↓';
+
+  return (
+    <span
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        marginLeft: 6,
+        fontSize: 11,
+        fontWeight: 600,
+        color,
+      }}
+    >
+      {arrow} {Math.abs(change).toFixed(1)}%
+    </span>
+  );
+}
+
 export function StatusBadge({ status }) {
   const statusMap = {
     PENDING: { label: 'Pending', variant: 'default' },
