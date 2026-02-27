@@ -1,18 +1,16 @@
 import { useState } from 'react';
 import { T } from '../../data/constants';
-import { Icon } from '../../data/icons';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { useStore } from '../../store';
-import api from '../../services/api';
+import { Spinner } from '../ui/Spinner';
 
 export function AuthModal({ isOpen, onClose }) {
-  const [authMode, setAuthMode] = useState('login'); // 'login' or 'register'
+  const [mode, setMode] = useState('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -23,40 +21,46 @@ export function AuthModal({ isOpen, onClose }) {
     setLoading(true);
     setError('');
 
-    try {
-      let data;
-      if (authMode === 'login') {
-        data = await api.login(email, password);
-      } else {
-        data = await api.register({ email, password, name, phone });
-      }
+    // Simulate API call
+    await new Promise(r => setTimeout(r, 800));
 
-      setUser(data.data.user);
-      onClose();
-    } catch (err) {
-      setError(err.message || 'Something went wrong');
-    } finally {
+    // Basic validation
+    if (!email || !password) {
+      setError('Please fill in all fields');
       setLoading(false);
+      return;
     }
-  };
 
-  const handleLineLogin = async () => {
-    try {
-      const data = await api.request('/auth/line');
-      if (data.data?.url) {
-        window.location.href = data.data.url;
-      }
-    } catch (err) {
-      setError('LINE Login not available');
+    if (mode === 'register' && !name) {
+      setError('Please enter your name');
+      setLoading(false);
+      return;
     }
+
+    // Create user
+    const user = {
+      id: `user_${Date.now()}`,
+      name: mode === 'register' ? name : email.split('@')[0],
+      email,
+      role: 'BUYER',
+    };
+
+    setUser(user);
+    setLoading(false);
+    onClose();
+
+    // Reset form
+    setEmail('');
+    setPassword('');
+    setName('');
   };
 
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={authMode === 'login' ? 'Welcome Back' : 'Create Account'}
-      width={400}
+      title={mode === 'login' ? 'Sign In' : 'Create Account'}
+      width={380}
     >
       <form onSubmit={handleSubmit}>
         {error && (
@@ -65,7 +69,7 @@ export function AuthModal({ isOpen, onClose }) {
               background: T.errorBg,
               color: T.error,
               padding: 12,
-              borderRadius: T.radius,
+              borderRadius: 10,
               marginBottom: 16,
               fontSize: 14,
             }}
@@ -74,73 +78,49 @@ export function AuthModal({ isOpen, onClose }) {
           </div>
         )}
 
-        {authMode === 'register' && (
-          <>
-            <Input
-              label="Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Your full name"
-              required
-            />
-            <Input
-              label="Phone"
-              type="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="08X-XXX-XXXX"
-            />
-          </>
+        {mode === 'register' && (
+          <Input
+            placeholder="Full Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
         )}
 
         <Input
-          label="Email"
           type="email"
+          placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="you@example.com"
           required
         />
 
         <Input
-          label="Password"
           type="password"
+          placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          placeholder={authMode === 'register' ? 'At least 8 characters' : 'Enter password'}
           required
         />
 
-        <Button type="submit" fullWidth disabled={loading} style={{ marginTop: 8 }}>
-          {loading ? 'Please wait...' : authMode === 'login' ? 'Sign In' : 'Create Account'}
+        <Button type="submit" disabled={loading} style={{ width: '100%', marginTop: 8 }}>
+          {loading ? (
+            <Spinner size={18} color={T.white} />
+          ) : mode === 'login' ? (
+            'Sign In'
+          ) : (
+            'Create Account'
+          )}
         </Button>
       </form>
 
-      <div style={{ margin: '20px 0', textAlign: 'center' }}>
-        <span style={{ color: T.gray, fontSize: 13 }}>or continue with</span>
-      </div>
-
-      <Button
-        variant="outline"
-        fullWidth
-        onClick={handleLineLogin}
-        style={{
-          color: '#00B900',
-          borderColor: '#00B900',
-          gap: 8,
-        }}
-      >
-        <span style={{ color: '#00B900' }}>{Icon.line}</span>
-        LINE
-      </Button>
-
       <div style={{ marginTop: 20, textAlign: 'center' }}>
-        {authMode === 'login' ? (
+        {mode === 'login' ? (
           <p style={{ margin: 0, fontSize: 14, color: T.gray }}>
             Don't have an account?{' '}
             <button
               type="button"
-              onClick={() => setAuthMode('register')}
+              onClick={() => { setMode('register'); setError(''); }}
               style={{
                 background: 'none',
                 border: 'none',
@@ -157,7 +137,7 @@ export function AuthModal({ isOpen, onClose }) {
             Already have an account?{' '}
             <button
               type="button"
-              onClick={() => setAuthMode('login')}
+              onClick={() => { setMode('login'); setError(''); }}
               style={{
                 background: 'none',
                 border: 'none',

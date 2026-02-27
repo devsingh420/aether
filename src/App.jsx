@@ -7,7 +7,6 @@ import { Header } from './components/layout/Header';
 import { CartPanel } from './components/cart/CartPanel';
 import { AuthModal } from './components/cart/AuthModal';
 import { QuickCheckout } from './components/checkout/QuickCheckout';
-import { QuickUpload } from './components/farm/QuickUpload';
 
 // Pages
 import { MarketPage } from './pages/MarketPage';
@@ -22,11 +21,10 @@ import { useStore } from './store';
 // Styles
 import { T } from './data/constants';
 
-// Create React Query client
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
+      staleTime: 1000 * 60 * 5,
       retry: 1,
     },
   },
@@ -34,25 +32,27 @@ const queryClient = new QueryClient({
 
 function AppContent() {
   const navigate = useNavigate();
-  const { showCart, setShowCart, showAuth, setShowAuth, user, cart } = useStore();
+  const { showCart, setShowCart, showAuth, setShowAuth, cart, clearCart } = useStore();
   const [showQuickCheckout, setShowQuickCheckout] = useState(false);
-  const [showQuickUpload, setShowQuickUpload] = useState(false);
-
-  const isFarmer = user?.role === 'FARM_OWNER';
+  const [orderComplete, setOrderComplete] = useState(null);
 
   const handleSelectProduct = (product) => {
     navigate(`/product/${product.id}`);
   };
 
   const handleCheckout = () => {
-    // Use quick checkout for faster experience
     setShowCart(false);
     setShowQuickCheckout(true);
   };
 
-  const handleFullCheckout = () => {
+  const handleOrderComplete = (order) => {
+    setOrderComplete(order);
     setShowQuickCheckout(false);
-    navigate('/checkout');
+    // Show success briefly then navigate
+    setTimeout(() => {
+      setOrderComplete(null);
+      navigate('/orders');
+    }, 2000);
   };
 
   const handleBack = () => {
@@ -162,72 +162,61 @@ function AppContent() {
       <QuickCheckout
         isOpen={showQuickCheckout}
         onClose={() => setShowQuickCheckout(false)}
-        onComplete={(order) => {
-          navigate(`/orders/${order.orderNumber}`);
-        }}
-      />
-      <QuickUpload
-        isOpen={showQuickUpload}
-        onClose={() => setShowQuickUpload(false)}
-        onSubmit={(product) => {
-          console.log('Quick upload:', product);
-          // In real app, this would call API
-        }}
+        onComplete={handleOrderComplete}
       />
 
-      {/* Floating Action Button for Farmers */}
-      {isFarmer && (
+      {/* Order Success Toast */}
+      {orderComplete && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 20,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            background: T.green,
+            color: '#fff',
+            padding: '16px 24px',
+            borderRadius: 12,
+            boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
+            zIndex: 1000,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+          }}
+        >
+          <span style={{ fontSize: 24 }}>✓</span>
+          <div>
+            <div style={{ fontWeight: 600 }}>Order Placed!</div>
+            <div style={{ fontSize: 13, opacity: 0.9 }}>#{orderComplete.orderNumber}</div>
+          </div>
+        </div>
+      )}
+
+      {/* Floating Cart Button (when items in cart and cart not visible) */}
+      {cart.length > 0 && !showCart && !showQuickCheckout && (
         <button
-          onClick={() => setShowQuickUpload(true)}
+          onClick={() => setShowCart(true)}
           style={{
             position: 'fixed',
             bottom: 24,
             right: 24,
-            width: 56,
-            height: 56,
-            borderRadius: '50%',
+            padding: '14px 24px',
+            borderRadius: 50,
             background: T.green,
             color: '#fff',
             border: 'none',
-            boxShadow: '0 4px 12px rgba(45,106,79,0.4)',
+            boxShadow: '0 4px 20px rgba(45,106,79,0.4)',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: 24,
-            zIndex: 100,
-          }}
-          title="Quick Sale"
-        >
-          +
-        </button>
-      )}
-
-      {/* Quick checkout FAB when cart has items */}
-      {cart.length > 0 && !showCart && !showQuickCheckout && (
-        <button
-          onClick={() => setShowQuickCheckout(true)}
-          style={{
-            position: 'fixed',
-            bottom: isFarmer ? 90 : 24,
-            right: 24,
-            padding: '12px 20px',
-            borderRadius: 28,
-            background: T.green,
-            color: '#fff',
-            border: 'none',
-            boxShadow: '0 4px 12px rgba(45,106,79,0.4)',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            fontSize: 14,
+            gap: 10,
+            fontSize: 15,
             fontWeight: 600,
             zIndex: 100,
           }}
         >
           <span>🛒</span>
-          Quick Checkout ({cart.length})
+          View Cart ({cart.length})
         </button>
       )}
     </div>

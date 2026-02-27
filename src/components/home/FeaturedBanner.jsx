@@ -1,31 +1,20 @@
 import { useState, useEffect } from 'react';
 import { T } from '../../data/constants';
-import { Button } from '../ui/Button';
 
 const BANNERS = [
   {
     id: 1,
-    title: 'Fresh From Farm to Table',
-    subtitle: 'Get 15% off on your first wholesale order',
-    cta: 'Shop Now',
-    bg: 'linear-gradient(135deg, #2D5A27 0%, #4A7C43 100%)',
-    image: 'https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=800',
+    title: 'Farm Fresh, Delivered Fast',
+    subtitle: 'Premium Thai produce from verified local farms',
+    bg: 'linear-gradient(135deg, #1B4332 0%, #2D6A4F 100%)',
+    image: 'https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=800&q=80',
   },
   {
     id: 2,
-    title: 'Flash Sale: Premium Fruits',
-    subtitle: 'Up to 30% off on Grade A produce',
-    cta: 'View Deals',
-    bg: 'linear-gradient(135deg, #E85D04 0%, #F48C06 100%)',
-    image: 'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?w=800',
-  },
-  {
-    id: 3,
-    title: 'Support Local Farmers',
-    subtitle: 'Direct from verified Thai farms',
-    cta: 'Explore Farms',
-    bg: 'linear-gradient(135deg, #1B4332 0%, #2D6A4F 100%)',
-    image: 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=800',
+    title: 'Seasonal Mangoes',
+    subtitle: 'Nam Dok Mai at peak sweetness',
+    bg: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
+    image: 'https://images.unsplash.com/photo-1553279768-865429fa0078?w=800&q=80',
   },
 ];
 
@@ -34,7 +23,7 @@ export function FeaturedBanner({ onAction }) {
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % BANNERS.length);
+      setCurrent(prev => (prev + 1) % BANNERS.length);
     }, 5000);
     return () => clearInterval(timer);
   }, []);
@@ -45,12 +34,11 @@ export function FeaturedBanner({ onAction }) {
     <div
       style={{
         position: 'relative',
-        borderRadius: 16,
+        borderRadius: 20,
         overflow: 'hidden',
-        marginBottom: 24,
-        height: 180,
+        marginBottom: 32,
+        height: 160,
         background: banner.bg,
-        transition: 'background 0.5s ease',
       }}
     >
       {/* Background image */}
@@ -64,13 +52,12 @@ export function FeaturedBanner({ onAction }) {
           backgroundImage: `url(${banner.image})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          opacity: 0.3,
+          opacity: 0.25,
           maskImage: 'linear-gradient(to right, transparent, black)',
           WebkitMaskImage: 'linear-gradient(to right, transparent, black)',
         }}
       />
 
-      {/* Content */}
       <div
         style={{
           position: 'relative',
@@ -81,63 +68,27 @@ export function FeaturedBanner({ onAction }) {
           justifyContent: 'center',
         }}
       >
-        <h2
-          style={{
-            margin: 0,
-            fontSize: 24,
-            fontWeight: 700,
-            color: '#fff',
-            marginBottom: 8,
-          }}
-        >
+        <h2 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: '#fff' }}>
           {banner.title}
         </h2>
-        <p
-          style={{
-            margin: 0,
-            fontSize: 14,
-            color: 'rgba(255,255,255,0.9)',
-            marginBottom: 16,
-          }}
-        >
+        <p style={{ margin: '8px 0 0', fontSize: 14, color: 'rgba(255,255,255,0.85)' }}>
           {banner.subtitle}
         </p>
-        <div>
-          <Button
-            onClick={() => onAction?.(banner)}
-            style={{
-              background: '#fff',
-              color: T.green,
-              fontWeight: 600,
-            }}
-          >
-            {banner.cta}
-          </Button>
-        </div>
       </div>
 
       {/* Dots */}
-      <div
-        style={{
-          position: 'absolute',
-          bottom: 12,
-          right: 16,
-          display: 'flex',
-          gap: 6,
-        }}
-      >
+      <div style={{ position: 'absolute', bottom: 12, right: 16, display: 'flex', gap: 6 }}>
         {BANNERS.map((_, idx) => (
           <button
             key={idx}
             onClick={() => setCurrent(idx)}
             style={{
-              width: 8,
-              height: 8,
+              width: 6,
+              height: 6,
               borderRadius: '50%',
               border: 'none',
               background: idx === current ? '#fff' : 'rgba(255,255,255,0.4)',
               cursor: 'pointer',
-              transition: 'background 0.2s',
             }}
           />
         ))}

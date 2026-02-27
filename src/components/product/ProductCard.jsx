@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { T, GRADES, CONFIG } from '../../data/constants';
-import { Icon } from '../../data/icons';
+import { T, GRADES } from '../../data/constants';
 import { useStore } from '../../store';
 import { fmt, getWholesalePrice, pct } from '../../utils/helpers';
 import { PriceChangeBadge } from '../ui/Badge';
@@ -13,17 +12,13 @@ export function ProductCard({ product, onClick }) {
   const grade = GRADES[product.grade] || GRADES.B;
   const isWholesale = mode === 'wholesale';
 
-  // Get pricing based on mode
   const retailPrice = Number(product.retailPrice);
   const wholesalePrice = getWholesalePrice(product, product.moqWholesale || 50);
   const displayPrice = isWholesale ? wholesalePrice : retailPrice;
-  const unit = isWholesale ? `/${product.unit}` : `/${product.retailUnit}`;
 
   const handleAddToCart = (e) => {
     e.stopPropagation();
-    if (!isWholesale) {
-      addToCart(product, 1);
-    }
+    addToCart(product, product.moqRetail || 1);
   };
 
   return (
@@ -33,24 +28,18 @@ export function ProductCard({ product, onClick }) {
       onMouseLeave={() => setHovered(false)}
       style={{
         background: T.white,
-        borderRadius: T.radius * 1.5,
+        borderRadius: 16,
         overflow: 'hidden',
         cursor: 'pointer',
-        transition: 'all 0.3s',
-        transform: hovered ? 'translateY(-4px)' : 'none',
+        transition: 'all 0.2s ease',
+        transform: hovered ? 'translateY(-2px)' : 'none',
         boxShadow: hovered
-          ? '0 12px 24px rgba(0,0,0,0.1)'
-          : '0 2px 8px rgba(0,0,0,0.04)',
+          ? '0 8px 24px rgba(0,0,0,0.12)'
+          : '0 2px 8px rgba(0,0,0,0.06)',
       }}
     >
       {/* Image */}
-      <div
-        style={{
-          position: 'relative',
-          paddingTop: '75%',
-          background: T.subtle,
-        }}
-      >
+      <div style={{ position: 'relative', paddingTop: '75%', background: T.subtle }}>
         <img
           src={product.images?.[0] || product.img}
           alt={product.name}
@@ -60,8 +49,6 @@ export function ProductCard({ product, onClick }) {
             width: '100%',
             height: '100%',
             objectFit: 'cover',
-            transition: 'transform 0.3s',
-            transform: hovered ? 'scale(1.05)' : 'scale(1)',
           }}
         />
 
@@ -69,8 +56,8 @@ export function ProductCard({ product, onClick }) {
         <div
           style={{
             position: 'absolute',
-            top: 12,
-            left: 12,
+            top: 10,
+            left: 10,
             padding: '4px 10px',
             borderRadius: 6,
             background: grade.bg,
@@ -79,16 +66,16 @@ export function ProductCard({ product, onClick }) {
             fontWeight: 700,
           }}
         >
-          Grade {grade.label}
+          {grade.label}
         </div>
 
-        {/* Wholesale savings badge */}
+        {/* Wholesale savings */}
         {isWholesale && wholesalePrice < retailPrice && (
           <div
             style={{
               position: 'absolute',
-              top: 12,
-              right: 12,
+              top: 10,
+              right: 10,
               padding: '4px 8px',
               borderRadius: 6,
               background: T.green,
@@ -97,18 +84,18 @@ export function ProductCard({ product, onClick }) {
               fontWeight: 600,
             }}
           >
-            Save {pct(wholesalePrice, retailPrice)}%
+            -{pct(wholesalePrice, retailPrice)}%
           </div>
         )}
 
-        {/* Quick add button (retail only) */}
+        {/* Quick add */}
         {!isWholesale && hovered && (
           <button
             onClick={handleAddToCart}
             style={{
               position: 'absolute',
-              bottom: 12,
-              right: 12,
+              bottom: 10,
+              right: 10,
               width: 36,
               height: 36,
               borderRadius: '50%',
@@ -119,108 +106,42 @@ export function ProductCard({ product, onClick }) {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              fontSize: 18,
               boxShadow: '0 4px 12px rgba(45,106,79,0.3)',
             }}
           >
-            {Icon.plus}
+            +
           </button>
         )}
       </div>
 
       {/* Content */}
-      <div style={{ padding: 16 }}>
-        {/* Farm info */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            marginBottom: 8,
-          }}
-        >
-          {farm.verified && (
-            <span style={{ color: T.green }}>{Icon.shield}</span>
-          )}
-          <span style={{ fontSize: 12, color: T.gray }}>
-            {farm.name || 'Farm'}
-          </span>
-          {farm.rating && (
-            <span
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 2,
-                fontSize: 12,
-                color: T.warning,
-              }}
-            >
-              {Icon.star} {Number(farm.rating).toFixed(1)}
-            </span>
-          )}
+      <div style={{ padding: 14 }}>
+        {/* Farm */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 6 }}>
+          {farm.verified && <span style={{ color: T.green, fontSize: 12 }}>✓</span>}
+          <span style={{ fontSize: 12, color: T.gray }}>{farm.name || 'Farm'}</span>
         </div>
 
-        {/* Product name */}
-        <h3
-          style={{
-            margin: 0,
-            fontSize: 16,
-            fontWeight: 600,
-            color: T.text,
-            marginBottom: 4,
-          }}
-        >
+        {/* Name */}
+        <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: T.text }}>
           {product.name}
         </h3>
 
-        {/* Stock info */}
-        <p
-          style={{
-            margin: 0,
-            fontSize: 13,
-            color: T.gray,
-            marginBottom: 12,
-          }}
-        >
-          {product.stock || product.avail} {product.unit} available
+        {/* Stock */}
+        <p style={{ margin: '4px 0 10px', fontSize: 12, color: T.gray }}>
+          {product.stock?.toLocaleString()} {product.unit} available
         </p>
 
         {/* Price */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'baseline',
-            justifyContent: 'space-between',
-          }}
-        >
-          <div>
-            <span
-              style={{
-                fontSize: 20,
-                fontWeight: 700,
-                color: T.green,
-              }}
-            >
-              {fmt(displayPrice)}
-            </span>
-            <span style={{ fontSize: 13, color: T.gray }}>{unit}</span>
-            <PriceChangeBadge change={product.priceChange} />
-          </div>
-
-          {/* Cold chain indicator */}
-          {product.needsColdChain && (
-            <span
-              style={{
-                color: '#60a5fa',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 4,
-                fontSize: 12,
-              }}
-              title="Cold chain required"
-            >
-              {Icon.snowflake}
-            </span>
-          )}
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <span style={{ fontSize: 18, fontWeight: 700, color: T.green }}>
+            {fmt(displayPrice)}
+          </span>
+          <span style={{ fontSize: 12, color: T.gray, marginLeft: 4 }}>
+            /{product.retailUnit}
+          </span>
+          <PriceChangeBadge change={product.priceChange} />
         </div>
       </div>
     </div>
