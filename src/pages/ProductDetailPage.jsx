@@ -199,18 +199,7 @@ export function ProductDetailPage() {
             {product.desc}
           </p>
 
-          {/* Specs */}
-          {product.specs && (
-            <div style={{ marginBottom: 20 }}>
-              <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 8 }}>Specifications</h3>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                {product.specs.map((spec, i) => (
-                  <Badge key={i}>{spec}</Badge>
-                ))}
-              </div>
-            </div>
-          )}
-
+          
           {/* Info grid */}
           <div
             style={{
@@ -220,10 +209,10 @@ export function ProductDetailPage() {
               marginBottom: 24,
             }}
           >
-            <InfoCard icon={Icon.calendar} label="Harvest" value={product.harvest} />
-            <InfoCard icon={Icon.truck} label="Shelf Life" value={product.shelf} />
-            <InfoCard icon={Icon.snowflake} label="Storage" value={product.storage} />
-            <InfoCard label="Stock" value={`${product.stock || product.avail} ${product.unit}`} />
+            <InfoCard label="Stock" value={`${(product.stock || 0).toLocaleString()} ${product.unit}`} />
+            <InfoCard label="Min Order" value={`${product.moqRetail || 1} ${product.retailUnit}`} />
+            {product.needsColdChain && <InfoCard icon={Icon.snowflake} label="Storage" value="Refrigerated" />}
+            <InfoCard label="Grade" value={`${product.grade} - ${grade.desc}`} />
           </div>
 
           {/* Pricing */}
